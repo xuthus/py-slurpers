@@ -1,0 +1,4 @@
+<x:movies xmlns:x='http://www.groovy-lang.org'>
+  <x:movie id='1'>the godfather</x:movie>
+  <x:movie id='2'>ronin</x:movie>
+</x:movies>

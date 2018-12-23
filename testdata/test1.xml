@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <man>
+    <name>John</name>
+    <surname>Lennon</surname>
+    <surname>Smith</surname>
+  </man>
+  <man>
+    <name>Mark</name>
+    <surname>Twain</surname>
+  </man>
+  <born>
+    <place>Russia</place>
+    <year>2018</year>
+  </born>
+</root>
