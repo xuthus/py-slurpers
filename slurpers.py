@@ -3,21 +3,11 @@ import _io
 
 
 class XmlSlurper:
-    options = {
-        'strip_namespace': True
-    }
-
-    def __init__(self, value=None, namespace: str = None):
+    def __init__(self, value):
         self._value = value
-        self.namespace = namespace
-        return
 
-    def __str__(self):
-        localValue = object.__getattribute__(self, "_value")
-        if isinstance(localValue, str):
-            return "::" + localValue
-        else:
-            return super.__str__(self)
+    def __len__(self):
+        return len(self._value)
 
     def __getattribute__(self, key: str):
         try:
@@ -28,75 +18,96 @@ class XmlSlurper:
                 return localValue
             if isinstance(localValue, (list, dict)):
                 if key in localValue:
-                    return localValue[key]
+                    result = localValue[key]
+                    if isinstance(result, (list, dict)):
+                        return XmlSlurper(result)
+                    else:
+                        return result
                 else:
                     raise KeyError(key)
+            return localValue # or raise KeyError(key)??
+
+    def __getitem__(self, key: str):
+        try:
+            return super.__getitem__(self, key)
+        except:
+            localValue = self._value
+            if isinstance(localValue, (list, dict)):
+                result = localValue[key]
+                if isinstance(result, (list, dict)):
+                    return XmlSlurper(result)
+                else:
+                    return result
             return localValue
 
-    @staticmethod
-    def extract_name(element: ET.Element):
-        name = element.tag
-        if '}' in name:
-            namespace = name[name.index('{') + 1:name.index('}') - 1]
-            name = name[name.index('}') + 1:]
-        else:
-            namespace = None
-        return name, namespace
-
-    @staticmethod
-    def _add_element_to_dict(element: ET.Element, map: dict):
-        tag, namespace = __class__.extract_name(element)
-        value = __class__._get_childs(element)
-        #value.namespace = namespace
-        if tag in map:
-            item = map[tag]
-            if item is list:
-                item.append(value)
-            else:
-                map[tag] = [item, value]
-        else:
-            map[tag] = value
-
-    @staticmethod
-    def _get_childs(element: ET.Element):
-        if len(element) == 0:
-            return element.text
-        else:
-            map = {}
-            for child in element:
-                __class__._add_element_to_dict(child, map)
-            return __class__(value=map)
+    def __str__(self):
+        return str(self._value)
 
     @classmethod
     def create(cls, data=None, file_name: str = None):
         if file_name is not None:
-            return cls._get_childs(ET.parse(file_name).getroot())
+            return XmlSlurper(cls._get_map(ET.parse(file_name).getroot()))
         if isinstance(data, str):
-            return cls._get_childs(ET.fromstring(data))
+            return XmlSlurper(cls._get_map(ET.fromstring(data)))
         if isinstance(data, _io._TextIOBase):
-            return cls._get_childs(ET.fromstring(data.read()))
+            return XmlSlurper(cls._get_map(ET.fromstring(data.read())))
         if isinstance(data, ET.Element):
-            return cls._get_childs(data)
+            return XmlSlurper(cls._get_map(data))
         raise TypeError('Illegal input argument [data]')
 
+    @classmethod
+    def _extract_name(cls, elem):
+        result = elem.tag
+        p = result.find('}')
+        if p > 0:
+            return result[p+1:]
+        return result
 
-tree = ET.parse('testdata/test1.xml')
+    @classmethod
+    def _get_map(cls, elem):
+        if len(elem) == 0:
+            return elem.text
+        else:
+            result = {}
+            for child in elem:
+                child_map = cls._get_map(child)
+                child_name = cls._extract_name(child)
+                if child_name in result:
+                    if isinstance(result[child_name], list):
+                        result[child_name].append(child_map)
+                    else:
+                        result[child_name] = [result[child_name], child_map]
+                else:
+                    result[child_name] = child_map
+            return result
+
+
+tree = ET.parse('testdata/beatles.xml')
 root = tree.getroot()
 xml = XmlSlurper.create(root)
 
-print(xml.man)
+for m in xml.man:
+    print(m)
 
-for man in xml.man:
-    print(man.name)
-    print(man.surname[0])
-print(xml.born.place)
-print(xml.born.year)
+xml = XmlSlurper.create(file_name = 'testdata/beatles.xml')
+for beatle in xml.man:
+    print(beatle.surname)
+    #print('{} {} born at {} in {}'.format(' '.join(beatle.name) if isinstance(beatle.name, list) else beatle.name, beatle.surname, beatle.born.year, beatle.born.place))
+
 
 xml = XmlSlurper.create("<data><name>Sergey</name></data>")
 print(xml.name)
 
 xml = XmlSlurper.create("<name>Singletag</name>")
 print(xml)
+
+xml = XmlSlurper.create("<root><man><name>John</name><surname>Lennon</surname><surname>Smith</surname></man><man><name>Mark</name><surname>Twain</surname></man><born><place>Russia</place><year>2018</year></born></root>")
+print(xml.born.place)
+
+
+with open('testdata/singletag.xml', 'r') as f:
+    xml = XmlSlurper.create(f)
+    print(xml)
 
 with open('testdata/test1.xml', 'r') as f:
     xml = XmlSlurper.create(f)
@@ -130,15 +141,19 @@ except:
     print('OK: Wrong tag index handled')
     pass
 
-# test files
+# # test files
 xml = XmlSlurper.create(file_name='testdata/logback.xml')
 print(xml.appender[0].encoder.pattern)
 print(xml.appender[0].filter.level)
 print(len(xml.appender))
 
 xml = XmlSlurper.create(file_name='testdata/test.xml')
+print(xml)
 print(xml.movie[0])
 print(len(xml.movie))
 for movie in xml.movie:
     print(movie)
     #print(movie, movie.namespace)
+
+xml = XmlSlurper.create("<name>Singletag</name>")
+print(xml)
