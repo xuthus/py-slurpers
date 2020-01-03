@@ -1,10 +1,40 @@
 import xml.etree.ElementTree as ET
 import _io
+import re
+
+class Constants:
+    STRIP = 1
+    REPLACE_WITH_UNDERSCORES = 2
+    STRIP_CAPITALIZE = 3
+    IGNORE_TAGS = 4
+    USE_NAME_FUNCTION = 5
+
+
+def strip_illegal_chars_capitalize(s: str):
+    res = ''
+    cap = False
+    for c in s:
+        if c in ['-', '.']:
+            cap = True
+        else:
+            res = res + (c.upper() if cap else c)
+            cap = False
+    return res
+
+
+def replace_illegal_chars_with(s: str, ch: str):
+    return re.sub('[-\.]', ch, s)
+
+
+def strip_illegal_chars(s: str):
+    return replace_illegal_chars_with(s, '')
 
 
 class XmlSlurper:
+
     def __init__(self, value):
         self._value = value
+        self._illegal_chars = Constants.REPLACE_WITH_UNDERSCORES
 
     def __len__(self):
         return len(self._value)
@@ -44,41 +74,55 @@ class XmlSlurper:
         return str(self._value)
 
     @classmethod
-    def create(cls, data=None, file_name: str = None):
+    def create(cls, data=None, file_name: str = None, illegal_chars: int = Constants.REPLACE_WITH_UNDERSCORES, name_func = None):
+        options = {'illegal_chars': illegal_chars, 'name_func': name_func}
         if file_name is not None:
-            return XmlSlurper(cls._get_map(ET.parse(file_name).getroot()))
+            return XmlSlurper(cls._get_map(ET.parse(file_name).getroot(), options))
         if isinstance(data, str):
-            return XmlSlurper(cls._get_map(ET.fromstring(data)))
+            return XmlSlurper(cls._get_map(ET.fromstring(data), options))
         if isinstance(data, _io._TextIOBase):
-            return XmlSlurper(cls._get_map(ET.fromstring(data.read())))
+            return XmlSlurper(cls._get_map(ET.fromstring(data.read()), options))
         if isinstance(data, ET.Element):
-            return XmlSlurper(cls._get_map(data))
+            return XmlSlurper(cls._get_map(data, options))
         raise TypeError('Illegal input argument [data]')
 
     @classmethod
-    def _extract_name(cls, elem):
+    def _extract_name(cls, elem, _illegal_chars, name_func):
         result = elem.tag
         p = result.find('}')
         if p > 0:
-            return result[p+1:]
+            result = result[p+1:]
+        if ('-' in result) or ('.' in result):
+            if _illegal_chars == Constants.REPLACE_WITH_UNDERSCORES:
+                result = replace_illegal_chars_with(result, '_')
+            elif _illegal_chars == Constants.STRIP_CAPITALIZE:
+                result = strip_illegal_chars_capitalize(result)
+            elif _illegal_chars == Constants.STRIP:
+                result = strip_illegal_chars(result)
+            elif _illegal_chars == Constants.IGNORE_TAGS:
+                result = None
+        result = result if name_func is None else name_func(result)
         return result
 
     @classmethod
-    def _get_map(cls, elem):
+    def _get_map(cls, elem, options: dict):
         if len(elem) == 0:
             return elem.text
         else:
             result = {}
+            illegal_chars = options['illegal_chars']
+            name_func = options['name_func']
             for child in elem:
-                child_map = cls._get_map(child)
-                child_name = cls._extract_name(child)
-                if child_name in result:
-                    if isinstance(result[child_name], list):
-                        result[child_name].append(child_map)
+                child_name = cls._extract_name(child, illegal_chars, name_func)
+                if not (child_name is None):
+                    child_map = cls._get_map(child, options)
+                    if child_name in result:
+                        if isinstance(result[child_name], list):
+                            result[child_name].append(child_map)
+                        else:
+                            result[child_name] = [result[child_name], child_map]
                     else:
-                        result[child_name] = [result[child_name], child_map]
-                else:
-                    result[child_name] = child_map
+                        result[child_name] = child_map
             return result
 
 
@@ -157,3 +201,43 @@ for movie in xml.movie:
 
 xml = XmlSlurper.create("<name>Singletag</name>")
 print(xml)
+
+xml = XmlSlurper.create(file_name = 'testdata/beatles.xml')
+for man in xml.man:
+    print('{} {} born at {} in {}'.format(' '.join(man.name), man.surname, man.born.year, man.born.place))
+
+xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml')
+print(xml.tag_one)
+print(xml.tag_two)
+
+xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.STRIP)
+print(xml.tagone)
+print(xml.tagtwo)
+
+xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.IGNORE_TAGS)
+try:
+    print(xml.tag_one)
+    print('failed IGNORE_TAGS')
+except:
+    print('ok IGNORE_TAGS')
+    pass
+
+xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.REPLACE_WITH_UNDERSCORES)
+print(xml.tag_one)
+print(xml.tag_two)
+
+print(strip_illegal_chars_capitalize('test-tag'))
+print(strip_illegal_chars_capitalize('test-t.ag'))
+print(strip_illegal_chars_capitalize('test-.-tag'))
+print(strip_illegal_chars_capitalize('testtag'))
+print(strip_illegal_chars_capitalize('_'))
+
+xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.STRIP_CAPITALIZE)
+print(xml.tagOne)
+print(xml.tagTwo)
+
+xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.USE_NAME_FUNCTION, name_func = lambda x: strip_illegal_chars(x) + '__')
+print(xml.tagone__)
+print(xml.tagtwo__)
+
+
