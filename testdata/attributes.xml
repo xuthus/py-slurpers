@@ -1,0 +1,8 @@
+<root>
+    <country name="Russia">
+        <population>100</population>
+    </country>
+    <country name="Spain">
+        <population>30</population>
+    </country>
+</root>

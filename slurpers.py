@@ -123,6 +123,16 @@ class XmlSlurper:
                             result[child_name] = [result[child_name], child_map]
                     else:
                         result[child_name] = child_map
+            for attr in elem.attrib:
+                child_name = attr
+                child_map = elem.attrib[attr]
+                if child_name in result:
+                    if isinstance(result[child_name], list):
+                        result[child_name].append(child_map)
+                    else:
+                        result[child_name] = [result[child_name], child_map]
+                else:
+                    result[child_name] = child_map
             return result
 
 
@@ -251,3 +261,6 @@ except:
     print('ok comment')
 
 
+xml = XmlSlurper.create(file_name = 'testdata/attributes.xml')
+for country in xml.country:
+    print("{}: {}".format(country.name, country.population))
