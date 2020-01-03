@@ -241,3 +241,13 @@ print(xml.tagone__)
 print(xml.tagtwo__)
 
 
+xml = XmlSlurper.create(file_name = 'testdata/cdata.xml')
+print(xml.tag1)
+print(xml.tag2)
+try:
+    print(xml.tag3)
+    print('failed comment')
+except:
+    print('ok comment')
+
+

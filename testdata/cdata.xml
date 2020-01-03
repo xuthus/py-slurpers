@@ -1,0 +1,7 @@
+<root>
+    <tag1>text value</tag1>
+    <tag2><![CDATA[text <message> with CDATA </message>]]></tag2>
+    <!--
+    <tag3><![CDATA[text <message> with CDATA </message>]]></tag3>
+    -->
+</root>
