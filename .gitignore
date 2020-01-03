@@ -1,2 +1,3 @@
 locals/*
 .vscode/*
+__pycache__
