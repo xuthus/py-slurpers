@@ -1,0 +1,32 @@
+{
+	"name": "Joan",
+	"surname": "Baez",
+	"born": 1941,
+	"albums": [
+		{
+			"name": "Folksingers 'Round Harvard Square",
+			"year": 1959,
+			"number-of-tracks": 18
+		},
+		{
+			"name": "Joan Baez",
+			"year": 1960,
+			"number-of-tracks": 16
+		},
+		{
+			"name": "Joan Baez, Vol. 2",
+			"year": 1961,
+			"number-of-tracks": 17
+		},
+		{
+			"name": "Joan Baez/5",
+			"year": 1964,
+			"number-of-tracks": 14
+		},
+		{
+			"name": "Farewell, Angelina",
+			"year": 1965,
+			"number-of-tracks": 14
+		}
+	]
+}

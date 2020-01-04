@@ -172,16 +172,40 @@ class XmlSlurperBuilder(AbstractSlurperBuilder):
 class JsonSlurperBuilder(AbstractSlurperBuilder):
 
     def fromFile(self):
-        return None
+        with open(self.file_name, "r") as f:
+            return JsonSlurper(self._get_map(json.loads(f.read()), self.options))
 
     def fromString(self):
-        return None
+        return JsonSlurper(self._get_map(json.loads(self.data), self.options))
 
     def fromStream(self):
-        return None
+        return JsonSlurper(self._get_map(json.loads(self.data.read()), self.options))
 
-    def _get_map(self, elem, options: dict):
-        return None
+    def _get_map(self, tree, options: dict):
+        if isinstance(tree, dict):
+            result = {}
+            illegal_chars = options['illegal_chars']
+            name_func = options['name_func']
+            for child in tree:
+                child_name = self._extract_name(str(child), illegal_chars, name_func)
+                if not (child_name is None):
+                    child_map = self._get_map(tree[child], options)
+                    if child_name in result:
+                        if isinstance(result[child_name], list):
+                            result[child_name].append(child_map)
+                        else:
+                            result[child_name] = [result[child_name], child_map]
+                    else:
+                        result[child_name] = child_map
+            return result
+        elif isinstance(tree, list):
+            result = []
+            for i in range(len(tree)):
+                child_map = self._get_map(tree[i], options)
+                result.append(child_map)
+            return result
+        else:
+            return tree
 
 
 class XmlSlurper(AbstractSlurper):

@@ -5,6 +5,7 @@ from xml.etree.ElementTree import ParseError
 
 class TestSlurperFunctions(unittest.TestCase):
     def test_strip_illegal_chars_capitalize(self):
+        self.assertEqual('numberOfTracks', strip_illegal_chars_capitalize('number-of-tracks'))
         self.assertEqual('testone', strip_illegal_chars_capitalize('testone'))
         self.assertEqual('testone', strip_illegal_chars_capitalize('testone-'))
         self.assertEqual('testOne', strip_illegal_chars_capitalize('test-one'))
@@ -138,6 +139,40 @@ class TestXmlSlurper(unittest.TestCase):
             'Russia: 100\nSpain: 30',
             '\n'.join(res)
         )
+
+
+class TestJsonSlurper(unittest.TestCase):
+
+    def test_baez(self):
+        json = JsonSlurper.create(file_name = "testdata/baez.json", illegal_chars = Constants.STRIP_CAPITALIZE)
+        self.assertEqual("Joan", json.name)
+        self.assertEqual("Baez", json.surname)
+        self.assertEqual(1941, json.born)
+        self.assertEqual(5, len(json.albums))
+        self.assertEqual("Farewell, Angelina", json.albums[4].name)
+        self.assertEqual(14, json.albums[4].numberOfTracks)
+
+    def test_strings(self):
+        json = JsonSlurper.create(
+            data = '{"name": "Joan", "surname": "Baez", "born": 1941, "albums": [{"name": "Folksingers \'Round Harvard Square", "year": 1959}, {"name": "Joan Baez", "year": 1960}]}', 
+            illegal_chars = Constants.STRIP_CAPITALIZE
+        )
+        self.assertEqual("Joan", json.name)
+        self.assertEqual("Baez", json.surname)
+        self.assertEqual(1941, json.born)
+        self.assertEqual(2, len(json.albums))
+        self.assertEqual("Joan Baez", json.albums[1].name)
+
+    def test_streams(self):
+        with open("testdata/baez.json", "r") as f:
+            json = JsonSlurper.create(data = f, illegal_chars = Constants.STRIP_CAPITALIZE)
+            self.assertEqual("Joan", json.name)
+            self.assertEqual("Baez", json.surname)
+            self.assertEqual(1941, json.born)
+            self.assertEqual(5, len(json.albums))
+            self.assertEqual("Folksingers 'Round Harvard Square", json.albums[0].name)
+            self.assertEqual(18, json.albums[0].numberOfTracks)
+
 
 if __name__ == "__main__":
     unittest.main()
