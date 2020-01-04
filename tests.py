@@ -120,7 +120,7 @@ class TestXmlSlurper(unittest.TestCase):
         self.assertEqual('value 1', xml.tagone__)
         self.assertEqual('value 2', xml.tagtwo__)
 
-        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.IGNORE_TAGS)
+        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.IGNORE_NAMES)
         with self.assertRaises(KeyError):
             print(xml.tag_one)
 
@@ -184,6 +184,22 @@ class TestCharsets(unittest.TestCase):
     def test_charsets_json(self):
         xml = JsonSlurper.create(file_name = 'testdata/balalaika.json', file_charset="windows-1251")
         self.assertEqual("Юрий", xml.spacemans[0].name)
+
+
+class TestConfigSlurper(unittest.TestCase):
+
+    def test_google_config(self):
+        config = ConfigSlurper.create(file_name = "testdata/google.config", illegal_chars = Constants.STRIP_CAPITALIZE)
+        self.assertEqual("mysql.google.com", config.Database.host)
+        self.assertEqual("https://google.com/admin/index.py", config.AdminPage.url)
+        self.assertEqual("admin", config.AdminPage.userName)
+        self.assertEqual("Балалайка", config.NationalSupport.randomWord)
+
+        config = ConfigSlurper.create(file_name = "testdata/google.config")
+        self.assertEqual("mysql.google.com", config.Database.host)
+        self.assertEqual("https://google.com/admin/index.py", config.Admin_page.url)
+        self.assertEqual("admin", config.Admin_page.user_name)
+        self.assertEqual("Балалайка", config.National_Support.random_word)
 
 
 if __name__ == "__main__":
