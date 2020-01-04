@@ -104,23 +104,23 @@ class TestXmlSlurper(unittest.TestCase):
         self.assertEqual('value 1', xml.tag_one)
         self.assertEqual('value 2', xml.tag_two)
 
-        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.STRIP)
+        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars_action = Constants.STRIP)
         self.assertEqual('value 1', xml.tagone)
         self.assertEqual('value 2', xml.tagtwo)
 
-        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.REPLACE_WITH_UNDERSCORES)
+        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars_action = Constants.REPLACE_WITH_UNDERSCORES)
         self.assertEqual('value 1', xml.tag_one)
         self.assertEqual('value 2', xml.tag_two)
 
-        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.STRIP_CAPITALIZE)
+        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars_action = Constants.STRIP_CAPITALIZE)
         self.assertEqual('value 1', xml.tagOne)
         self.assertEqual('value 2', xml.tagTwo)
 
-        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.USE_NAME_FUNCTION, name_func = lambda x: strip_illegal_chars(x) + '__')
+        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars_action = Constants.USE_NAME_FUNCTION, name_func = lambda x: strip_illegal_chars(x) + '__')
         self.assertEqual('value 1', xml.tagone__)
         self.assertEqual('value 2', xml.tagtwo__)
 
-        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars = Constants.IGNORE_NAMES)
+        xml = XmlSlurper.create(file_name = 'testdata/tags-illegals.xml', illegal_chars_action = Constants.IGNORE_NAMES)
         with self.assertRaises(KeyError):
             print(xml.tag_one)
 
@@ -144,7 +144,7 @@ class TestXmlSlurper(unittest.TestCase):
 class TestJsonSlurper(unittest.TestCase):
 
     def test_baez(self):
-        json = JsonSlurper.create(file_name = "testdata/baez.json", illegal_chars = Constants.STRIP_CAPITALIZE)
+        json = JsonSlurper.create(file_name = "testdata/baez.json", illegal_chars_action = Constants.STRIP_CAPITALIZE)
         self.assertEqual("Joan", json.name)
         self.assertEqual("Baez", json.surname)
         self.assertEqual(1941, json.born)
@@ -155,7 +155,7 @@ class TestJsonSlurper(unittest.TestCase):
     def test_strings(self):
         json = JsonSlurper.create(
             data = '{"name": "Joan", "surname": "Baez", "born": 1941, "albums": [{"name": "Folksingers \'Round Harvard Square", "year": 1959}, {"name": "Joan Baez", "year": 1960}]}', 
-            illegal_chars = Constants.STRIP_CAPITALIZE
+            illegal_chars_action = Constants.STRIP_CAPITALIZE
         )
         self.assertEqual("Joan", json.name)
         self.assertEqual("Baez", json.surname)
@@ -165,7 +165,7 @@ class TestJsonSlurper(unittest.TestCase):
 
     def test_streams(self):
         with open("testdata/baez.json", "r") as f:
-            json = JsonSlurper.create(data = f, illegal_chars = Constants.STRIP_CAPITALIZE)
+            json = JsonSlurper.create(data = f, illegal_chars_action = Constants.STRIP_CAPITALIZE)
             self.assertEqual("Joan", json.name)
             self.assertEqual("Baez", json.surname)
             self.assertEqual(1941, json.born)
@@ -189,7 +189,7 @@ class TestCharsets(unittest.TestCase):
 class TestConfigSlurper(unittest.TestCase):
 
     def test_google_config(self):
-        config = ConfigSlurper.create(file_name = "testdata/google.config", illegal_chars = Constants.STRIP_CAPITALIZE)
+        config = ConfigSlurper.create(file_name = "testdata/google.config", illegal_chars_action = Constants.STRIP_CAPITALIZE)
         self.assertEqual("mysql.google.com", config.Database.host)
         self.assertEqual("https://google.com/admin/index.py", config.AdminPage.url)
         self.assertEqual("admin", config.AdminPage.userName)

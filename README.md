@@ -1,10 +1,10 @@
-### Python slurpers for XML, JSON, configs (or .ini) and so on
+## Python slurpers for XML, JSON, configs (or .ini) and so on
 
 > Inspired by Groovy's XmlSlurper
 
 Slurper is a object that encapsulates access to structured document file using its dynamic fields as file tags.
 
-## JSON example:
+### JSON example:
 
 Json document:
 
@@ -55,7 +55,7 @@ self.assertEqual("Farewell, Angelina", json.albums[4].name)
 self.assertEqual(14, json.albums[4].numberOfTracks)
 ```
 
-## Config example:
+### Config example:
 
 Sample config file:
 
@@ -78,7 +78,7 @@ self.assertEqual("mysql.google.com", config.Database.host)
 self.assertEqual("google", config.Security.auth_provider)
 ```
 
-## XML example:
+### XML example:
 
 Xml document (see in `testdata/test1.xml`):
 ```xml

@@ -44,7 +44,7 @@ def strip_illegal_chars(s: str, illegal_chars_mask: str = '[-\.]'):
 class AbstractSlurper(metaclass=ABCMeta):
     def __init__(self, value):
         self._value = value
-        self._illegal_chars = Constants.REPLACE_WITH_UNDERSCORES
+        self._illegal_chars_action = Constants.REPLACE_WITH_UNDERSCORES
 
     def __len__(self):
         return len(self._value)
@@ -147,10 +147,10 @@ class XmlSlurperBuilder(AbstractSlurperBuilder):
             return elem.text
         else:
             result = {}
-            illegal_chars = options['illegal_chars']
+            illegal_chars_action = options['illegal_chars_action']
             name_func = options['name_func']
             for child in elem:
-                child_name = self._extract_name(strip_namespace(child.tag), illegal_chars, name_func)
+                child_name = self._extract_name(strip_namespace(child.tag), illegal_chars_action, name_func)
                 if not (child_name is None):
                     child_map = self._get_map(child, options)
                     if child_name in result:
@@ -188,10 +188,10 @@ class JsonSlurperBuilder(AbstractSlurperBuilder):
     def _get_map(self, tree, options: dict):
         if isinstance(tree, dict):
             result = {}
-            illegal_chars = options['illegal_chars']
+            illegal_chars_action = options['illegal_chars_action']
             name_func = options['name_func']
             for child in tree:
-                child_name = self._extract_name(str(child), illegal_chars, name_func)
+                child_name = self._extract_name(str(child), illegal_chars_action, name_func)
                 if not (child_name is None):
                     child_map = self._get_map(tree[child], options)
                     if child_name in result:
@@ -232,7 +232,7 @@ class ConfigSlurperBuilder(AbstractSlurperBuilder):
 
     def _get_map(self, tree, options: dict):
         result = {}
-        illegal_chars_action = options['illegal_chars']
+        illegal_chars_action = options['illegal_chars_action']
         name_func = options['name_func']
         illegal_chars = ['-', ' ', '.', '/', '#']
         illegal_chars_mask = '[-\.\/\#\s]'
@@ -251,10 +251,10 @@ class ConfigSlurperBuilder(AbstractSlurperBuilder):
 class XmlSlurper(AbstractSlurper):
 
     @classmethod
-    def create(cls, data=None, file_name: str = None, illegal_chars: int = Constants.REPLACE_WITH_UNDERSCORES, 
+    def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES, 
             name_func = None, file_charset: str = "UTF8"):
         options = {
-            'illegal_chars': illegal_chars, 
+            'illegal_chars_action': illegal_chars_action, 
             'name_func': name_func,
             'file_charset': file_charset
         }
@@ -273,10 +273,10 @@ class XmlSlurper(AbstractSlurper):
 class JsonSlurper(AbstractSlurper):
 
     @classmethod
-    def create(cls, data=None, file_name: str = None, illegal_chars: int = Constants.REPLACE_WITH_UNDERSCORES, 
+    def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES, 
             name_func = None, file_charset: str = "UTF8"):
         options = {
-            'illegal_chars': illegal_chars, 
+            'illegal_chars_action': illegal_chars_action,
             'name_func': name_func,
             'file_charset': file_charset
         }
@@ -293,10 +293,10 @@ class JsonSlurper(AbstractSlurper):
 class ConfigSlurper(AbstractSlurper):
 
     @classmethod
-    def create(cls, data=None, file_name: str = None, illegal_chars: int = Constants.REPLACE_WITH_UNDERSCORES, 
+    def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES, 
             name_func = None, file_charset: str = "UTF8"):
         options = {
-            'illegal_chars': illegal_chars, 
+            'illegal_chars_action': illegal_chars_action,
             'name_func': name_func,
             'file_charset': file_charset
         }
