@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<root>
+    <spaceman title="cosmonaut">
+        <name>Юрий</name>
+        <surname>Гагарин</surname>
+        <country>USSR</country>
+        <year>1961</year>
+    </spaceman>
+    <spaceman title="astronaut">
+        <name>John</name>
+        <surname>Glenn</surname>
+        <country>USA</country>
+        <year>1962</year>
+    </spaceman>
+</root>

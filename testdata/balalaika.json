@@ -1,0 +1,18 @@
+{
+	"spacemans": [
+		{
+			"title": "cosmonaut",
+	        	"name": "ёрий",
+        		"surname": "√агарин",
+        		"country": "USSR",
+	        	"year": 1961
+	        },
+		{
+			"title": "astronaut",
+	        	"name": "John",
+        		"surname": "Glenn",
+        		"country": "USA",
+	        	"year": 1962
+	        }
+	]
+}

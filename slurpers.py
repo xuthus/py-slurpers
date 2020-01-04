@@ -172,7 +172,7 @@ class XmlSlurperBuilder(AbstractSlurperBuilder):
 class JsonSlurperBuilder(AbstractSlurperBuilder):
 
     def fromFile(self):
-        with open(self.file_name, "r") as f:
+        with open(self.file_name, "r", encoding=self.options['file_charset']) as f:
             return JsonSlurper(self._get_map(json.loads(f.read()), self.options))
 
     def fromString(self):
@@ -211,10 +211,12 @@ class JsonSlurperBuilder(AbstractSlurperBuilder):
 class XmlSlurper(AbstractSlurper):
 
     @classmethod
-    def create(cls, data=None, file_name: str = None, illegal_chars: int = Constants.REPLACE_WITH_UNDERSCORES, name_func = None):
+    def create(cls, data=None, file_name: str = None, illegal_chars: int = Constants.REPLACE_WITH_UNDERSCORES, 
+            name_func = None, file_charset: str = "UTF8"):
         options = {
             'illegal_chars': illegal_chars, 
-            'name_func': name_func
+            'name_func': name_func,
+            'file_charset': file_charset
         }
         builder = XmlSlurperBuilder(data, file_name, options)
         if file_name is not None:
@@ -231,10 +233,12 @@ class XmlSlurper(AbstractSlurper):
 class JsonSlurper(AbstractSlurper):
 
     @classmethod
-    def create(cls, data=None, file_name: str = None, illegal_chars: int = Constants.REPLACE_WITH_UNDERSCORES, name_func = None):
+    def create(cls, data=None, file_name: str = None, illegal_chars: int = Constants.REPLACE_WITH_UNDERSCORES, 
+            name_func = None, file_charset: str = "UTF8"):
         options = {
             'illegal_chars': illegal_chars, 
-            'name_func': name_func
+            'name_func': name_func,
+            'file_charset': file_charset
         }
         builder = JsonSlurperBuilder(data, file_name, options)
         if file_name is not None:

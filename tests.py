@@ -174,5 +174,17 @@ class TestJsonSlurper(unittest.TestCase):
             self.assertEqual(18, json.albums[0].numberOfTracks)
 
 
+
+class TestCharsets(unittest.TestCase):
+
+    def test_charsets_xml(self):
+        xml = XmlSlurper.create(file_name = 'testdata/balalaika.xml', file_charset="windows-1251")
+        self.assertEqual("Гагарин", xml.spaceman[0].surname)
+
+    def test_charsets_json(self):
+        xml = JsonSlurper.create(file_name = 'testdata/balalaika.json', file_charset="windows-1251")
+        self.assertEqual("Юрий", xml.spacemans[0].name)
+
+
 if __name__ == "__main__":
     unittest.main()
