@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pyslurpers",
-    version="0.0.6",
+    version="0.1.2",
     author="Sergey Yanzin",
     author_email="yanzinsg@gmail.com",
     description="Python slurpers package for simple XML, JSON, config, etc. processing",
@@ -18,10 +18,6 @@ setuptools.setup(
     keywords="pyslurpers xml json config cfg ini parse processing",
     platforms=["any"],
     install_requires=[
-        "unittest",
-        "xml",
-        "json",
-        "abc",
         "configparser"
     ],
     package_data={
