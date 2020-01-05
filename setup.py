@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pyslurpers", # Replace with your own username
+    name="pyslurpers",
     version="0.0.6",
     author="Sergey Yanzin",
     author_email="yanzinsg@gmail.com",
@@ -15,9 +15,9 @@ setuptools.setup(
     packages=['pyslurpers'],
     package_dir={'pyslurpers': 'src'},
     license="MIT License",
-    keywords="pyslurpers xml json config cfg ini parse",
-    platforms = ["any"],
-    install_requires = [
+    keywords="pyslurpers xml json config cfg ini parse processing",
+    platforms=["any"],
+    install_requires=[
         "unittest",
         "xml",
         "json",
@@ -25,22 +25,22 @@ setuptools.setup(
         "configparser"
     ],
     package_data={
-        'pyslurpers': 
-        [
-            'testdata/google.config', 
-            'testdata/baez.json', 
-            'testdata/balalaika.json', 
-            'testdata/attributes.xml', 
-            'testdata/balalaika.xml', 
-            'testdata/beatles.xml', 
-            'testdata/cdata.xml', 
-            'testdata/logback.xml', 
-            'testdata/singletag.xml', 
-            'testdata/tags-illegals.xml', 
-            'testdata/test.xml', 
-            'testdata/test1.xml', 
-            'testdata/test2.xml'
-        ]
+        'pyslurpers':
+            [
+                'testdata/google.config',
+                'testdata/baez.json',
+                'testdata/balalaika.json',
+                'testdata/attributes.xml',
+                'testdata/balalaika.xml',
+                'testdata/beatles.xml',
+                'testdata/cdata.xml',
+                'testdata/logback.xml',
+                'testdata/singletag.xml',
+                'testdata/tags-illegals.xml',
+                'testdata/test.xml',
+                'testdata/test1.xml',
+                'testdata/test2.xml'
+            ]
     },
     classifiers=[
         "Programming Language :: Python :: 3",

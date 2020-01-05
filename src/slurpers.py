@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from xml.etree import ElementTree
 import _io
-import re
-import json
 import configparser
+import json
+import re
 from abc import ABCMeta, abstractmethod
+from xml.etree import ElementTree
 
 
 class Constants:
@@ -19,11 +19,11 @@ class Constants:
 def strip_namespace(s: str):
     p = s.find('}')
     if p > 0:
-        return s[p+1:]
+        return s[p + 1:]
     return s
 
 
-def strip_illegal_chars_capitalize(s: str, illegal_chars: list = ['-', '.']):
+def strip_illegal_chars_capitalize(s: str, illegal_chars: tuple = ('-', '.')):
     res = ''
     cap = False
     for c in s:
@@ -35,11 +35,11 @@ def strip_illegal_chars_capitalize(s: str, illegal_chars: list = ['-', '.']):
     return res
 
 
-def replace_illegal_chars_with(s: str, ch: str, illegal_chars_mask: str = '[-\.]'):
+def replace_illegal_chars_with(s: str, ch: str, illegal_chars_mask: str = '[-.]'):
     return re.sub(illegal_chars_mask, ch, s)
 
 
-def strip_illegal_chars(s: str, illegal_chars_mask: str = '[-\.]'):
+def strip_illegal_chars(s: str, illegal_chars_mask: str = '[-.]'):
     return replace_illegal_chars_with(s, '', illegal_chars_mask)
 
 
@@ -55,32 +55,32 @@ class AbstractSlurper(metaclass=ABCMeta):
         try:
             return super.__getattribute__(self, key)
         except:
-            localValue = object.__getattribute__(self, "_value")
+            local_value = object.__getattribute__(self, "_value")
             if key == "_value":
-                return localValue
-            if isinstance(localValue, (list, dict)):
-                if key in localValue:
-                    result = localValue[key]
+                return local_value
+            if isinstance(local_value, (list, dict)):
+                if key in local_value:
+                    result = local_value[key]
                     if isinstance(result, (list, dict)):
                         return XmlSlurper(result)
                     else:
                         return result
                 else:
                     raise KeyError(key)
-            return localValue # or raise KeyError(key)??
+            return local_value  # or raise KeyError(key)??
 
     def __getitem__(self, key: str):
         try:
             return super.__getitem__(self, key)
         except:
-            localValue = self._value
-            if isinstance(localValue, (list, dict)):
-                result = localValue[key]
+            local_value = self._value
+            if isinstance(local_value, (list, dict)):
+                result = local_value[key]
                 if isinstance(result, (list, dict)):
                     return XmlSlurper(result)
                 else:
                     return result
-            return localValue
+            return local_value
 
     def __str__(self):
         return str(self._value)
@@ -109,18 +109,20 @@ class AbstractSlurperBuilder(metaclass=ABCMeta):
     def _get_map(self, elem, options: dict):
         pass
 
-    def _extract_name(self, childName: str, illegal_chars_action, name_func = None, illegal_chars: list = ['-', '.'], illegal_chars_mask: str = '[-\.]'):
-        result = childName
-        hasIllegalChars = False
+    @staticmethod
+    def _extract_name(child_name: str, illegal_chars_action, name_func=None, illegal_chars: tuple = ('-', '.'),
+                      illegal_chars_mask: str = '[-.]'):
+        result = child_name
+        has_illegal_chars = False
         for c in illegal_chars:
-            hasIllegalChars = hasIllegalChars or c in result
-        if hasIllegalChars:
+            has_illegal_chars = has_illegal_chars or c in result
+        if has_illegal_chars:
             if illegal_chars_action == Constants.REPLACE_WITH_UNDERSCORES:
-                result = replace_illegal_chars_with(result, '_', illegal_chars_mask = illegal_chars_mask)
+                result = replace_illegal_chars_with(result, '_', illegal_chars_mask=illegal_chars_mask)
             elif illegal_chars_action == Constants.STRIP_CAPITALIZE:
-                result = strip_illegal_chars_capitalize(result, illegal_chars = illegal_chars)
+                result = strip_illegal_chars_capitalize(result, illegal_chars=illegal_chars)
             elif illegal_chars_action == Constants.STRIP:
-                result = strip_illegal_chars(result, illegal_chars_mask = illegal_chars_mask)
+                result = strip_illegal_chars(result, illegal_chars_mask=illegal_chars_mask)
             elif illegal_chars_action == Constants.IGNORE_NAMES:
                 result = None
         result = result if name_func is None else name_func(result)
@@ -236,15 +238,17 @@ class ConfigSlurperBuilder(AbstractSlurperBuilder):
         result = {}
         illegal_chars_action = options['illegal_chars_action']
         name_func = options['name_func']
-        illegal_chars = ['-', ' ', '.', '/', '#']
-        illegal_chars_mask = '[-\.\/\#\s]'
+        illegal_chars = ('-', ' ', '.', '/', '#')
+        illegal_chars_mask = '[-\.\/#\s]'
         for section in tree.sections():
-            section_name = self._extract_name(section, illegal_chars_action, name_func, illegal_chars = illegal_chars, illegal_chars_mask = illegal_chars_mask)
+            section_name = self._extract_name(section, illegal_chars_action, name_func, illegal_chars=illegal_chars,
+                                              illegal_chars_mask=illegal_chars_mask)
             if not (section_name is None):
                 child_map = {}
                 options = tree.options(section)
                 for option in options:
-                    option_name = self._extract_name(option, illegal_chars_action, name_func, illegal_chars = illegal_chars, illegal_chars_mask = illegal_chars_mask)
+                    option_name = self._extract_name(option, illegal_chars_action, name_func,
+                                                     illegal_chars=illegal_chars, illegal_chars_mask=illegal_chars_mask)
                     child_map[option_name] = tree.get(section, option)
                 result[section_name] = child_map
         return result
@@ -253,10 +257,10 @@ class ConfigSlurperBuilder(AbstractSlurperBuilder):
 class XmlSlurper(AbstractSlurper):
 
     @classmethod
-    def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES, 
-            name_func = None, file_charset: str = "UTF8"):
+    def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES,
+               name_func=None, file_charset: str = "UTF8"):
         options = {
-            'illegal_chars_action': illegal_chars_action, 
+            'illegal_chars_action': illegal_chars_action,
             'name_func': name_func,
             'file_charset': file_charset
         }
@@ -275,8 +279,8 @@ class XmlSlurper(AbstractSlurper):
 class JsonSlurper(AbstractSlurper):
 
     @classmethod
-    def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES, 
-            name_func = None, file_charset: str = "UTF8"):
+    def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES,
+               name_func=None, file_charset: str = "UTF8"):
         options = {
             'illegal_chars_action': illegal_chars_action,
             'name_func': name_func,
@@ -295,8 +299,8 @@ class JsonSlurper(AbstractSlurper):
 class ConfigSlurper(AbstractSlurper):
 
     @classmethod
-    def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES, 
-            name_func = None, file_charset: str = "UTF8"):
+    def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES,
+               name_func=None, file_charset: str = "UTF8"):
         options = {
             'illegal_chars_action': illegal_chars_action,
             'name_func': name_func,
