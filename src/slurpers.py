@@ -9,11 +9,17 @@ from xml.etree import ElementTree
 
 
 class Constants:
+    """Constants for slurpers"""
     STRIP = 1
+    """Strip illegal characters in a tag name: 'birth-date' -> 'birthdate'"""
     REPLACE_WITH_UNDERSCORES = 2
+    """(Default action) Replace illegal characters in a tag name with underscores: 'birth-date' -> 'birth_date'"""
     STRIP_CAPITALIZE = 3
+    """Strip illegal characters in a tag name and capitalize next character: 'birth-date' -> 'birthDate'"""
     IGNORE_NAMES = 4
+    """Ignore tags whose names contain illegal characters"""
     USE_NAME_FUNCTION = 5
+    """Use `name_func` function to convert tag name to field name (see `AbstractSlurperBuilder._extract_name()`)"""
 
 
 def strip_namespace(s: str):
@@ -255,10 +261,24 @@ class ConfigSlurperBuilder(AbstractSlurperBuilder):
 
 
 class XmlSlurper(AbstractSlurper):
-
+    """
+    Object representation for Xml document\n
+    Object can be used for read purposes only - xml modification is not available at all.
+    Illegal characters for json tags are: `-` (hyphen), and `.` (dot).
+    """
     @classmethod
     def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES,
                name_func=None, file_charset: str = "UTF8"):
+        """
+        Create python object from the given xml document.\n
+        The method converts each xml-tag to corresponding field and assigns its value.
+
+        **data** (optional) - xml-formatted source: string, text stream or ElementTree.Element\n
+        **file_name** (optional) - file name for xml document\n
+        **illegal_chars_action** (default: `REPLACE_WITH_UNDERSCORES`) - action applied to tags whose names contain illegal characters\n
+        **name_func** (optional) - function (or `lambda`) used to convert tag name to field name\n
+        **file_charset** (default: `UTF8`) - source file charset
+        """
         options = {
             'illegal_chars_action': illegal_chars_action,
             'name_func': name_func,
@@ -277,10 +297,24 @@ class XmlSlurper(AbstractSlurper):
 
 
 class JsonSlurper(AbstractSlurper):
-
+    """
+    Object representation for Json document\n
+    Object can be used for read purposes only - json modification is not available at all.
+    Illegal characters for json tags are: `-` (hyphen), and `.` (dot).
+    """
     @classmethod
     def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES,
                name_func=None, file_charset: str = "UTF8"):
+        """
+        Create python object from the given json document.\n
+        The method converts each json-tag to corresponding field and assigns its value.
+
+        **data** (optional) - json-formatted source: string or text stream\n
+        **file_name** (optional) - file name for json document\n
+        **illegal_chars_action** (default: `REPLACE_WITH_UNDERSCORES`) - action applied to tags whose names contain illegal characters\n
+        **name_func** (optional) - function (or `lambda`) used to convert tag name to field name\n
+        **file_charset** (default: `UTF8`) - source file charset
+        """
         options = {
             'illegal_chars_action': illegal_chars_action,
             'name_func': name_func,
@@ -297,10 +331,24 @@ class JsonSlurper(AbstractSlurper):
 
 
 class ConfigSlurper(AbstractSlurper):
-
+    """
+    Object representation for config (or ini) file\n
+    Object can be used for read purposes only - file modification is not available at all.\n\n
+    Illegal characters for config parameters are: `-` (hyphen), `.` (dot), ` ` (blank space), `/` (slash), and `#` (sharp).
+    """
     @classmethod
     def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES,
                name_func=None, file_charset: str = "UTF8"):
+        """
+        Create python object from the given config file.\n
+        The method converts each config section and parameter to corresponding field and assigns its value.
+
+        **data** (optional) - config (ini) source: string or text stream\n
+        **file_name** (optional) - file name for config file\n
+        **illegal_chars_action** (default: `REPLACE_WITH_UNDERSCORES`) - action applied to parameters whose names contain illegal characters\n
+        **name_func** (optional) - function (or `lambda`) used to convert parameter name to field name\n
+        **file_charset** (default: `UTF8`) - source file charset
+        """
         options = {
             'illegal_chars_action': illegal_chars_action,
             'name_func': name_func,
