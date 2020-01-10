@@ -4,6 +4,12 @@
 
 Slurper is a object that encapsulates access to structured document file using its dynamic fields as file tags.
 
+### Installation
+
+```bash
+pip install pyslurpers
+```
+
 ### JSON example:
 
 Json document:
