@@ -226,17 +226,20 @@ class ConfigSlurperBuilder(AbstractSlurperBuilder):
 
     def fromFile(self):
         config = configparser.ConfigParser()
+        config.optionxform = str
         with open(self.file_name, "r", encoding=self.options['file_charset']) as f:
             config.read_file(f)
         return ConfigSlurper(self._get_map(config, self.options))
 
     def fromString(self):
         config = configparser.ConfigParser()
+        config.optionxform = str
         config.read_string(self.data)
         return ConfigSlurper(self._get_map(config, self.options))
 
     def fromStream(self):
         config = configparser.ConfigParser()
+        config.optionxform = str
         config.read_file(self.data)
         return ConfigSlurper(self._get_map(config, self.options))
 
@@ -266,6 +269,7 @@ class XmlSlurper(AbstractSlurper):
     Object can be used for read purposes only - xml modification is not available at all.
     Illegal characters for json tags are: `-` (hyphen), and `.` (dot).
     """
+
     @classmethod
     def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES,
                name_func=None, file_charset: str = "UTF8"):
@@ -302,6 +306,7 @@ class JsonSlurper(AbstractSlurper):
     Object can be used for read purposes only - json modification is not available at all.
     Illegal characters for json tags are: `-` (hyphen), and `.` (dot).
     """
+
     @classmethod
     def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES,
                name_func=None, file_charset: str = "UTF8"):
@@ -336,6 +341,7 @@ class ConfigSlurper(AbstractSlurper):
     Object can be used for read purposes only - file modification is not available at all.\n\n
     Illegal characters for config parameters are: `-` (hyphen), `.` (dot), ` ` (blank space), `/` (slash), and `#` (sharp).
     """
+
     @classmethod
     def create(cls, data=None, file_name: str = None, illegal_chars_action: int = Constants.REPLACE_WITH_UNDERSCORES,
                name_func=None, file_charset: str = "UTF8"):

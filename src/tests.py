@@ -218,12 +218,16 @@ class TestConfigSlurper(unittest.TestCase):
         self.assertEqual("https://google.com/admin/index.py", config.AdminPage.url)
         self.assertEqual("admin", config.AdminPage.userName)
         self.assertEqual("Балалайка", config.NationalSupport.randomWord)
+        self.assertEqual("80", config.CaseSupport.period_xdays)
+        self.assertEqual("90", config.CaseSupport.period_Ndays)
 
         config = ConfigSlurper.create(file_name="testdata/google.config")
         self.assertEqual("mysql.google.com", config.Database.host)
         self.assertEqual("https://google.com/admin/index.py", config.Admin_page.url)
         self.assertEqual("admin", config.Admin_page.user_name)
         self.assertEqual("Балалайка", config.National_Support.random_word)
+        self.assertEqual("80", config.Case_support.period_xdays)
+        self.assertEqual("90", config.Case_support.period_Ndays)
 
 
 if __name__ == "__main__":
