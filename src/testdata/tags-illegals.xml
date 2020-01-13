@@ -1,4 +1,5 @@
 <root>
     <tag-one>value 1</tag-one>
     <tag.two>value 2</tag.two>
+    <taG.TwO>value 3</taG.TwO>
 </root>

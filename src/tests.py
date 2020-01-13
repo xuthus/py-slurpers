@@ -124,25 +124,30 @@ class TestXmlSlurper(unittest.TestCase):
         xml = XmlSlurper.create(file_name='testdata/tags-illegals.xml')
         self.assertEqual('value 1', xml.tag_one)
         self.assertEqual('value 2', xml.tag_two)
+        self.assertEqual('value 3', xml.taG_TwO)
 
         xml = XmlSlurper.create(file_name='testdata/tags-illegals.xml', illegal_chars_action=Constants.STRIP)
         self.assertEqual('value 1', xml.tagone)
         self.assertEqual('value 2', xml.tagtwo)
+        self.assertEqual('value 3', xml.taGTwO)
 
         xml = XmlSlurper.create(file_name='testdata/tags-illegals.xml',
                                 illegal_chars_action=Constants.REPLACE_WITH_UNDERSCORES)
         self.assertEqual('value 1', xml.tag_one)
         self.assertEqual('value 2', xml.tag_two)
+        self.assertEqual('value 3', xml.taG_TwO)
 
         xml = XmlSlurper.create(file_name='testdata/tags-illegals.xml', illegal_chars_action=Constants.STRIP_CAPITALIZE)
         self.assertEqual('value 1', xml.tagOne)
         self.assertEqual('value 2', xml.tagTwo)
+        self.assertEqual('value 3', xml.taGTwO)
 
         xml = XmlSlurper.create(file_name='testdata/tags-illegals.xml',
                                 illegal_chars_action=Constants.USE_NAME_FUNCTION,
                                 name_func=lambda x: strip_illegal_chars(x) + '__')
         self.assertEqual('value 1', xml.tagone__)
         self.assertEqual('value 2', xml.tagtwo__)
+        self.assertEqual('value 3', xml.taGTwO__)
 
         xml = XmlSlurper.create(file_name='testdata/tags-illegals.xml', illegal_chars_action=Constants.IGNORE_NAMES)
         with self.assertRaises(KeyError):
